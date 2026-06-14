@@ -45,6 +45,7 @@ import org.apache.fineract.client.models.PostRecurringDepositProductsRequest;
 import org.apache.fineract.client.models.PutFixedDepositProductsProductIdRequest;
 import org.apache.fineract.client.models.PutRecurringDepositProductsRequest;
 import org.apache.fineract.integrationtests.client.FeignIntegrationTest;
+import org.apache.fineract.integrationtests.client.feign.helpers.FeignBusinessDateHelper;
 import org.apache.fineract.integrationtests.client.feign.helpers.FeignClientHelper;
 import org.apache.fineract.integrationtests.client.feign.helpers.FeignSchedulerHelper;
 import org.apache.fineract.integrationtests.common.Utils;
@@ -59,14 +60,14 @@ public class FeignDepositProductArchivingTest extends FeignIntegrationTest {
 
     @Test
     public void testFixedDepositProductCanBeArchived() throws JsonProcessingException {
-        final LocalDate businessDate = Utils.getLocalDateOfTenant();
+        final LocalDate businessDate = businessDate();
         final Long productId = createFixedDepositProduct(businessDate.minusMonths(3));
 
         final GetFixedDepositAccountsTemplateResponse activeTemplate = ok(
                 () -> fineractClient().fixedDepositAccount().retrieveTemplateFixedDepositAccount(null, null, null, false));
         assertThat(activeTemplate.getProductOptions().stream().anyMatch(product -> productId.equals(product.getId()))).isTrue();
 
-        final Long clientId = new FeignClientHelper(fineractClient()).createClient();
+        final Long clientId = new FeignClientHelper(fineractClient()).createClient(format(businessDate));
         final Long existingAccountId = ok(() -> fineractClient().fixedDepositAccount()
                 .submitApplicationFixedDepositAccount(fixedDepositAccountRequest(clientId, productId, businessDate))).getResourceId();
 
@@ -101,14 +102,14 @@ public class FeignDepositProductArchivingTest extends FeignIntegrationTest {
 
     @Test
     public void testRecurringDepositProductCanBeArchived() throws JsonProcessingException {
-        final LocalDate businessDate = Utils.getLocalDateOfTenant();
+        final LocalDate businessDate = businessDate();
         final Long productId = createRecurringDepositProduct(businessDate.minusMonths(3));
 
         final GetRecurringDepositAccountsTemplateResponse activeTemplate = ok(
                 () -> fineractClient().recurringDepositAccount().retrieveTemplateRecurringDepositAccount(null, null, null, false));
         assertThat(activeTemplate.getProductOptions().stream().anyMatch(product -> productId.equals(product.getId()))).isTrue();
 
-        final Long clientId = new FeignClientHelper(fineractClient()).createClient();
+        final Long clientId = new FeignClientHelper(fineractClient()).createClient(format(businessDate));
         final Long existingAccountId = ok(() -> fineractClient().recurringDepositAccount()
                 .submitApplicationRecurringDepositAccount(recurringDepositAccountRequest(clientId, productId, businessDate)))
                 .getResourceId();
@@ -144,7 +145,7 @@ public class FeignDepositProductArchivingTest extends FeignIntegrationTest {
 
     @Test
     public void testArchivedDepositProductsRejectReinvestment() throws JsonProcessingException {
-        final LocalDate businessDate = Utils.getLocalDateOfTenant();
+        final LocalDate businessDate = businessDate();
         final LocalDate applicationDate = businessDate.minusMonths(8);
         final Long fixedDepositProductId = createFixedDepositProduct(applicationDate.minusMonths(1));
         final Long recurringDepositProductId = createRecurringDepositProduct(applicationDate.minusMonths(1));
@@ -258,5 +259,9 @@ public class FeignDepositProductArchivingTest extends FeignIntegrationTest {
 
     private String format(final LocalDate date) {
         return Utils.dateFormatter.format(date);
+    }
+
+    private LocalDate businessDate() {
+        return new FeignBusinessDateHelper(fineractClient()).getBusinessDate("BUSINESS_DATE").getDate();
     }
 }
