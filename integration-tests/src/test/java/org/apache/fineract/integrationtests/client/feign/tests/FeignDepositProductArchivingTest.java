@@ -195,8 +195,8 @@ public class FeignDepositProductArchivingTest extends FeignIntegrationTest {
         final PostFixedDepositProductsCharts chart = new PostFixedDepositProductsCharts().fromDate(format(chartStartDate))
                 .dateFormat(Utils.DATE_FORMAT).locale(Utils.LOCALE).chartSlabs(Set.of(chartSlab));
         final PostFixedDepositProductsRequest request = new PostFixedDepositProductsRequest().accountingRule(1).charts(Set.of(chart))
-                .currencyCode("USD").description("Fixed deposit product for archiving test").digitsAfterDecimal(4).inMultiplesOf(100)
-                .interestCalculationDaysInYearType(365).interestCalculationType(1).interestCompoundingPeriodType(4)
+                .currencyCode("USD").depositAmount(100000L).description("Fixed deposit product for archiving test").digitsAfterDecimal(4)
+                .inMultiplesOf(100).interestCalculationDaysInYearType(365).interestCalculationType(1).interestCompoundingPeriodType(4)
                 .interestPostingPeriodType(4).locale(Utils.LOCALE).maxDepositTerm(10).maxDepositTermTypeId(3).minDepositTerm(6)
                 .minDepositTermTypeId(2).name(Utils.uniqueRandomStringGenerator("FIXED_DEPOSIT_PRODUCT_", 6))
                 .preClosurePenalApplicable(true).preClosurePenalInterest(2.0).preClosurePenalInterestOnTypeId(1)

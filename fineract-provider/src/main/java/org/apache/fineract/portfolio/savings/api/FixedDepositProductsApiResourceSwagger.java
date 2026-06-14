@@ -107,6 +107,8 @@ final class FixedDepositProductsApiResourceSwagger {
         public Integer maxDepositTerm;
         @Schema(example = "3")
         public Integer maxDepositTermTypeId;
+        @Schema(example = "10000")
+        public Long depositAmount;
         public Set<PostFixedDepositProductsCharts> charts;
     }
 
